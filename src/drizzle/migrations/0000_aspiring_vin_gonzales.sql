@@ -30,7 +30,7 @@ CREATE TABLE "job_listings" (
 	"wage" integer,
 	"wageInterval" "job_listings_wage_interval",
 	"stateAbbreviation" varchar,
-	"state" varchar,
+	"city" varchar,
 	"isFeatured" boolean DEFAULT false NOT NULL,
 	"locationRequirement" "job_listings_location_requirement" NOT NULL,
 	"experienceLevel" "job_listings_experience_level" NOT NULL,
