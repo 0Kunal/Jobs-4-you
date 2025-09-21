@@ -6,23 +6,50 @@ import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
+const developerMode = false;
+
 export async function getCurrentUser({ allData = false } = {}) {
   const { userId } = await auth();
 
-  return {
-    userId,
-    user: allData && userId != null ? await getUser(userId) : undefined,
-  };
+  if (developerMode) {
+    return {
+      userId: userId,
+      user: {
+        id: userId,
+        name: "Kunal Kamat",
+        email: "kunalkamat4@gmail.com",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    };
+  } else {
+    return {
+      userId,
+      user: allData && userId != null ? await getUser(userId) : undefined,
+    };
+  }
 }
 
 export async function getCurrentOrganization({ allData = false } = {}) {
   const { orgId } = await auth();
 
-  return {
-    orgId,
-    organization:
-      allData && orgId != null ? await getOrganization(orgId) : undefined,
-  };
+  if (developerMode) {
+    return {
+      orgId: orgId,
+      organization: {
+        id: orgId,
+        name: "Acme Corp",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    };
+  } else {
+    return {
+      orgId,
+      organization:
+        allData && orgId != null ? await getOrganization(orgId) : undefined,
+    };
+  }
 }
 
 async function getUser(id: string) {
