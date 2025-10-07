@@ -1,4 +1,4 @@
-import { getGlobalTag, getIdlTag } from "@/lib/dataCache";
+import { getGlobalTag, getIdTag } from "@/lib/dataCache";
 import { revalidateTag } from "next/cache";
 
 export function getUserNotificationSettingsGlobalTag() {
@@ -6,7 +6,7 @@ export function getUserNotificationSettingsGlobalTag() {
 }
 
 export function getUserNotificationSettingsIdTag(userId: string) {
-  return getIdlTag("userNotificationSettings", userId);
+  return getIdTag("userNotificationSettings", userId);
 }
 
 export function revalidateUserNotificationSettingsCache(userId: string) {

@@ -1,4 +1,4 @@
-import { getGlobalTag, getIdlTag, getOrganizationTag } from "@/lib/dataCache";
+import { getGlobalTag, getIdTag, getOrganizationTag } from "@/lib/dataCache";
 import { revalidateTag } from "next/cache";
 
 export function getJobListingGlobalTag() {
@@ -10,7 +10,7 @@ export function getJobListingOrganizationTag(organizationId: string) {
 }
 
 export function getJobListingIdTag(id: string) {
-  return getIdlTag("jobListings", id);
+  return getIdTag("jobListings", id);
 }
 
 export function revalidateJobListingCache({
