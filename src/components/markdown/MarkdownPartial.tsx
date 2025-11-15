@@ -1,4 +1,5 @@
 "use client";
+
 import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   Dialog,
@@ -10,13 +11,13 @@ import {
 import { Button } from "../ui/button";
 
 export function MarkdownPartial({
-  dialogTitle,
   mainMarkdown,
   dialogMarkdown,
+  dialogTitle,
 }: {
-  dialogTitle: string;
   mainMarkdown: ReactNode;
   dialogMarkdown: ReactNode;
+  dialogTitle: string;
 }) {
   const [isOverflowing, setIsOverflowing] = useState(false);
 
@@ -35,13 +36,16 @@ export function MarkdownPartial({
       },
       { signal: controller.signal }
     );
-    return () => controller.abort();
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   useLayoutEffect(() => {
     if (markdownRef.current == null) return;
     checkOverflow(markdownRef.current);
-  });
+  }, []);
 
   return (
     <>
@@ -51,6 +55,7 @@ export function MarkdownPartial({
           <div className="bg-gradient-to-t from-background to-transparent to-15% inset-0 absolute pointer-events-none" />
         )}
       </div>
+
       {isOverflowing && (
         <Dialog>
           <DialogTrigger asChild>

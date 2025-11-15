@@ -1,4 +1,11 @@
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Suspense } from "react";
 import { DropzoneClient } from "./_DropzoneClient";
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentAuth";
@@ -10,6 +17,7 @@ import { getUserResumeIdTag } from "@/features/users/db/cache/userResumes";
 import { db } from "@/drizzle/db";
 import { eq } from "drizzle-orm";
 import { UserResumeTable } from "@/drizzle/schema";
+import { MarkdownRenderer } from "@/components/markdown/MarkdownRenderer";
 
 export default function UserResumePage() {
   return (
@@ -53,7 +61,26 @@ async function ResumeDetails() {
 }
 
 async function AISummaryCard() {
-  return null;
+  const { userId } = await getCurrentUser();
+  if (userId == null) return notFound();
+
+  const userResume = await getUserResume(userId);
+  if (userResume == null || userResume.aiSummary == null) return null;
+
+  return (
+    <Card>
+      <CardHeader className="border-b">
+        <CardTitle>AI Summary</CardTitle>
+        <CardDescription>
+          This s AI-generated summary of your resume. This is used by employers
+          to quickly understand your qualifcations and experience.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <MarkdownRenderer source={userResume.aiSummary} />
+      </CardContent>
+    </Card>
+  );
 }
 
 async function getUserResume(userId: string) {
