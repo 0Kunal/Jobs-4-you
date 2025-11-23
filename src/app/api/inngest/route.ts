@@ -6,6 +6,8 @@ import {
   clerkCreateOrganization,
   clerkUpdateOrganization,
   clerkDeleteOrganization,
+  clerkCreateOrgMembership,
+  clerkDeleteOrgMembership,
 } from "@/services/inngest/functions/clerk";
 import {
   prepareDailyUserJobListingNotifications,
@@ -24,6 +26,8 @@ export const { GET, POST, PUT } = serve({
     clerkCreateOrganization,
     clerkUpdateOrganization,
     clerkDeleteOrganization,
+    clerkCreateOrgMembership,
+    clerkDeleteOrgMembership,
     createAiSummaryOfUploadedResume,
     rankApplicaton,
     prepareDailyUserJobListingNotifications,
