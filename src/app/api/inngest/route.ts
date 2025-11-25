@@ -10,7 +10,9 @@ import {
   clerkDeleteOrgMembership,
 } from "@/services/inngest/functions/clerk";
 import {
+  prepareDailyOrganizationUserApplicationNotifications,
   prepareDailyUserJobListingNotifications,
+  sendDailyOrganizationUserApplicationEmail,
   sendDailyUserJobListingEmail,
 } from "@/services/inngest/functions/email";
 import { rankApplicaton } from "@/services/inngest/functions/jobListingApplication";
@@ -32,5 +34,7 @@ export const { GET, POST, PUT } = serve({
     rankApplicaton,
     prepareDailyUserJobListingNotifications,
     sendDailyUserJobListingEmail,
+    prepareDailyOrganizationUserApplicationNotifications,
+    sendDailyOrganizationUserApplicationEmail,
   ],
 });
