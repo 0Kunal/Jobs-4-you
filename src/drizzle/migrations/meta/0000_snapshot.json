@@ -1,5 +1,5 @@
 {
-  "id": "d00d61e7-d452-4f8c-b776-78b0fff6371d",
+  "id": "de3e4113-9dc2-48a6-945d-5cd021339286",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -398,8 +398,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "coverletter": {
-          "name": "coverletter",
+        "coverLetter": {
+          "name": "coverLetter",
           "type": "text",
           "primaryKey": false,
           "notNull": false

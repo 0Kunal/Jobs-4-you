@@ -1,62 +1,37 @@
 import { db } from "@/drizzle/db";
 import { OrganizationTable, UserTable } from "@/drizzle/schema";
-import { getUserIdTag } from "@/features/users/db/cache/users";
 import { getOrganizationIdTag } from "@/features/organizations/db/cache/organizations";
+import { getUserIdTag } from "@/features/users/db/cache/users";
 import { auth } from "@clerk/nextjs/server";
 import { eq } from "drizzle-orm";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
-const developerMode = false;
-
 export async function getCurrentUser({ allData = false } = {}) {
   const { userId } = await auth();
 
-  if (developerMode) {
-    return {
-      userId: userId,
-      user: {
-        id: userId,
-        name: "Kunal Kamat",
-        email: "kunalkamat4@gmail.com",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    };
-  } else {
-    return {
-      userId,
-      user: allData && userId != null ? await getUser(userId) : undefined,
-    };
-  }
+  return {
+    userId,
+    user: allData && userId != null ? await getUser(userId) : undefined,
+  };
 }
 
 export async function getCurrentOrganization({ allData = false } = {}) {
   const { orgId } = await auth();
 
-  if (developerMode) {
-    return {
-      orgId: orgId,
-      organization: {
-        id: orgId,
-        name: "Acme Corp",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    };
-  } else {
-    return {
-      orgId,
-      organization:
-        allData && orgId != null ? await getOrganization(orgId) : undefined,
-    };
-  }
+  return {
+    orgId,
+    organization:
+      allData && orgId != null ? await getOrganization(orgId) : undefined,
+  };
 }
 
 async function getUser(id: string) {
   "use cache";
   cacheTag(getUserIdTag(id));
 
-  return db.query.UserTable.findFirst({ where: eq(UserTable.id, id) });
+  return db.query.UserTable.findFirst({
+    where: eq(UserTable.id, id),
+  });
 }
 
 async function getOrganization(id: string) {

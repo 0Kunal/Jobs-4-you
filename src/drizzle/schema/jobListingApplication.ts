@@ -34,7 +34,7 @@ export const JobListingApplicationTable = pgTable(
     userId: varchar()
       .references(() => UserTable.id, { onDelete: "cascade" })
       .notNull(),
-    coverletter: text(),
+    coverLetter: text(),
     rating: integer(),
     stage: applicationStageEnum().notNull().default("applied"),
     createdAt,

@@ -61,7 +61,7 @@ CREATE TABLE "user_resumes" (
 CREATE TABLE "job_listing_applications" (
 	"jobListingId" uuid NOT NULL,
 	"userId" varchar NOT NULL,
-	"coverletter" text,
+	"coverLetter" text,
 	"rating" integer,
 	"stage" "job_listing_application_stage" DEFAULT 'applied' NOT NULL,
 	"createdAt" timestamp with time zone DEFAULT now() NOT NULL,

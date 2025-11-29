@@ -45,7 +45,7 @@ const NONE_SELECT_VALUE = "none";
 export default function JobListingForm({
   jobListing,
 }: {
-  jobListing: Pick<
+  jobListing?: Pick<
     typeof JobListingTable.$inferSelect,
     | "id"
     | "title"

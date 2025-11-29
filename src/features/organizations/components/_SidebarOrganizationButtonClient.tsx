@@ -1,16 +1,17 @@
 "use client";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SidebarMenuButton, useSidebar } from "@/components/ui/sidebar";
 import { SignOutButton } from "@/services/clerk/components/AuthButtons";
 import { useClerk } from "@clerk/nextjs";
-import { DropdownMenuLabel } from "@radix-ui/react-dropdown-menu";
 import {
   ArrowLeftRightIcon,
   Building2Icon,
@@ -54,7 +55,7 @@ export function SidebarOrganizationButtonClient({
       <DropdownMenuContent
         sideOffset={4}
         align="end"
-        side={isMobile ? "top" : "right"}
+        side={isMobile ? "bottom" : "right"}
         className="min-w-64 max-w-80"
       >
         <DropdownMenuLabel className="font-normal p-1">
@@ -81,8 +82,8 @@ export function SidebarOrganizationButtonClient({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/organization/select">
-            <ArrowLeftRightIcon className="mr-1" /> Switch Organization
+          <Link href="/organizations/select">
+            <ArrowLeftRightIcon className="mr-1" /> Switch Organizations
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />

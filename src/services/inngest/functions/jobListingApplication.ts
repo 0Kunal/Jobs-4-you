@@ -20,9 +20,9 @@ export const rankApplicaton = inngest.createFunction(
           eq(JobListingApplicationTable.userId, userId),
           eq(JobListingApplicationTable.jobListingId, jobListingId)
         ),
-        columns: { coverletter: true },
+        columns: { coverLetter: true },
       });
-      return application?.coverletter;
+      return application?.coverLetter;
     });
 
     const getResume = step.run("get-resume", async () => {
