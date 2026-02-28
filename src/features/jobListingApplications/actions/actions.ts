@@ -8,14 +8,11 @@ import {
   UserResumeTable,
 } from "@/drizzle/schema";
 import { newJobListingApplicationSchema } from "@/features/jobListingApplications/actions/schemas";
-import { getJobListingIdTag } from "@/features/jobListings/db/cache/jobListings";
-import { getUserResumeIdTag } from "@/features/users/db/cache/userResumes";
 import {
   getCurrentOrganization,
   getCurrentUser,
 } from "@/services/clerk/lib/getCurrentAuth";
 import { and, eq } from "drizzle-orm";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import z from "zod";
 import {
   insertJobListingApplication,
@@ -26,7 +23,7 @@ import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
 
 export async function createJobListingApplication(
   jobListingId: string,
-  unsafeData: z.infer<typeof newJobListingApplicationSchema>
+  unsafeData: z.infer<typeof newJobListingApplicationSchema>,
 ) {
   const permissionError = {
     error: true,
@@ -65,7 +62,7 @@ export async function createJobListingApplication(
 
 export async function updateJobListingApplicationStage(
   { userId, jobListingId }: { jobListingId: string; userId: string },
-  unsafeStage: ApplicationStage
+  unsafeStage: ApplicationStage,
 ) {
   const { success, data: stage } = z
     .enum(applicationStages)
@@ -102,7 +99,7 @@ export async function updateJobListingApplicationStage(
 
 export async function updateJobListingApplicationRating(
   { userId, jobListingId }: { jobListingId: string; userId: string },
-  unsafeRating: number | null
+  unsafeRating: number | null,
 ) {
   const { success, data: rating } = z
     .number()
@@ -141,22 +138,16 @@ export async function updateJobListingApplicationRating(
 }
 
 async function getPublicJobListing(id: string) {
-  "use cache";
-  cacheTag(getJobListingIdTag(id));
-
   return db.query.JobListingTable.findFirst({
     where: and(
       eq(JobListingTable.id, id),
-      eq(JobListingTable.status, "published")
+      eq(JobListingTable.status, "published"),
     ),
     columns: { id: true },
   });
 }
 
 async function getJobListing(id: string) {
-  "use cache";
-  cacheTag(getJobListingIdTag(id));
-
   return db.query.JobListingTable.findFirst({
     where: eq(JobListingTable.id, id),
     columns: { organizationId: true },
@@ -164,9 +155,6 @@ async function getJobListing(id: string) {
 }
 
 async function getUserResume(userId: string) {
-  "use cache";
-  cacheTag(getUserResumeIdTag(userId));
-
   return db.query.UserResumeTable.findFirst({
     where: eq(UserResumeTable.userId, userId),
     columns: { userId: true },

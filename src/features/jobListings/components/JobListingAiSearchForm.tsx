@@ -52,7 +52,7 @@ export function JobListingAiSearchForm() {
                 <Textarea {...field} className="min-h-32" />
               </FormControl>
               <FormDescription>
-                Provide a descriptionof your skills/experience as well as what
+                Provide a description of your skills/experience as well as what
                 you are looking for in a job. The more specific you are, the
                 better the results will be.
               </FormDescription>

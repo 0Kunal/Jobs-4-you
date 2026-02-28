@@ -24,9 +24,6 @@ import { connection } from "next/server";
 import { Badge } from "@/components/ui/badge";
 import JobListingBadges from "@/features/jobListings/components/JobListingBadges";
 import z from "zod";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
-import { getJobListingGlobalTag } from "@/features/jobListings/db/cache/jobListings";
-import { getOrganizationIdTag } from "@/features/organizations/db/cache/organizations";
 
 type Props = {
   searchParams: Promise<Record<string, string | string[]>>;
@@ -74,7 +71,7 @@ async function SuspendedComponent({ searchParams, params }: Props) {
           key={jobListing.id}
           className="block"
           href={`/job-listings/${jobListing.id}?${convertSearchParamsToString(
-            search
+            search,
           )}`}
         >
           <JobListingListItem
@@ -119,7 +116,7 @@ function JobListingListItem({
     <Card
       className={cn(
         "@container",
-        jobListing.isFeatured && "border-featured bg-featured/20"
+        jobListing.isFeatured && "border-featured bg-featured/20",
       )}
     >
       <CardHeader>
@@ -181,15 +178,12 @@ async function DaysSincePosting({ postedAt }: { postedAt: Date }) {
 
 async function getJobListings(
   searchParams: z.infer<typeof searchParamsSchema>,
-  jobListingId: string | undefined
+  jobListingId: string | undefined,
 ) {
-  "use cache";
-  cacheTag(getJobListingGlobalTag());
-
   const whereConditions: (SQL | undefined)[] = [];
   if (searchParams.title) {
     whereConditions.push(
-      ilike(JobListingTable.title, `%${searchParams.title}%`)
+      ilike(JobListingTable.title, `%${searchParams.title}%`),
     );
   }
   if (searchParams.city) {
@@ -197,12 +191,12 @@ async function getJobListings(
   }
   if (searchParams.state) {
     whereConditions.push(
-      ilike(JobListingTable.stateAbbreviation, `%${searchParams.state}%`)
+      ilike(JobListingTable.stateAbbreviation, `%${searchParams.state}%`),
     );
   }
   if (searchParams.experience) {
     whereConditions.push(
-      ilike(JobListingTable.experienceLevel, `%${searchParams.experience}%`)
+      ilike(JobListingTable.experienceLevel, `%${searchParams.experience}%`),
     );
   }
   if (searchParams.type) {
@@ -210,7 +204,7 @@ async function getJobListings(
   }
   if (searchParams.jobIds) {
     whereConditions.push(
-      or(...searchParams.jobIds.map((jobId) => eq(JobListingTable.id, jobId)))
+      or(...searchParams.jobIds.map((jobId) => eq(JobListingTable.id, jobId))),
     );
   }
 
@@ -219,19 +213,15 @@ async function getJobListings(
       jobListingId
         ? and(
             eq(JobListingTable.status, "published"),
-            eq(JobListingTable.id, jobListingId)
+            eq(JobListingTable.id, jobListingId),
           )
         : undefined,
-      and(eq(JobListingTable.status, "published"), ...whereConditions)
+      and(eq(JobListingTable.status, "published"), ...whereConditions),
     ),
     with: {
       organization: { columns: { id: true, name: true, imageUrl: true } },
     },
     orderBy: [desc(JobListingTable.isFeatured), desc(JobListingTable.postedAt)],
-  });
-
-  data.forEach((listing) => {
-    cacheTag(getOrganizationIdTag(listing.organization.id));
   });
 
   return data;

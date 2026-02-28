@@ -1,6 +1,4 @@
 import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
-import { getJobListingOrganizationTag } from "../db/cache/jobListings";
 import { db } from "@/drizzle/db";
 import { and, count, eq } from "drizzle-orm";
 import { JobListingTable } from "@/drizzle/schema";
@@ -36,33 +34,27 @@ export async function hasReachedMaxFeaturedJobListings() {
 }
 
 async function getPublishedJobListingCount(orgId: string) {
-  "use cache";
-  cacheTag(getJobListingOrganizationTag(orgId));
-
   const [res] = await db
     .select({ count: count() })
     .from(JobListingTable)
     .where(
       and(
         eq(JobListingTable.organizationId, orgId),
-        eq(JobListingTable.status, "published")
-      )
+        eq(JobListingTable.status, "published"),
+      ),
     );
   return res?.count ?? 0;
 }
 
 async function getFeaturedJobListingCount(orgId: string) {
-  "use cache";
-  cacheTag(getJobListingOrganizationTag(orgId));
-
   const [res] = await db
     .select({ count: count() })
     .from(JobListingTable)
     .where(
       and(
         eq(JobListingTable.organizationId, orgId),
-        eq(JobListingTable.isFeatured, true)
-      )
+        eq(JobListingTable.isFeatured, true),
+      ),
     );
   return res?.count ?? 0;
 }

@@ -3,13 +3,11 @@ import { Card, CardContent } from "@/components/ui/card";
 import { db } from "@/drizzle/db";
 import { OrganizationUserSettingsTable } from "@/drizzle/schema";
 import NotificationForm from "@/features/organizations/components/NotificationForm";
-import { getOrganizationUserSettingsIdTag } from "@/features/organizations/db/cache/organizationUserSettings.ts";
 import {
   getCurrentOrganization,
   getCurrentUser,
 } from "@/services/clerk/lib/getCurrentAuth";
 import { and, eq } from "drizzle-orm";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -62,13 +60,10 @@ async function getNotificationSettings({
   userId: string;
   organizationId: string;
 }) {
-  "use cache";
-  cacheTag(getOrganizationUserSettingsIdTag({ userId, organizationId }));
-
   return db.query.OrganizationUserSettingsTable.findFirst({
     where: and(
       eq(OrganizationUserSettingsTable.userId, userId),
-      eq(OrganizationUserSettingsTable.organizationId, organizationId)
+      eq(OrganizationUserSettingsTable.organizationId, organizationId),
     ),
     columns: { newApplicationEmailNotifications: true, minimumRating: true },
   });

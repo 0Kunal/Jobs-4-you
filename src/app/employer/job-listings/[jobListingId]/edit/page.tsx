@@ -2,10 +2,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { db } from "@/drizzle/db";
 import { JobListingTable } from "@/drizzle/schema";
 import JobListingForm from "@/features/jobListings/components/JobListingForm";
-import { getJobListingIdTag } from "@/features/jobListings/db/cache/jobListings";
 import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
 import { and, eq } from "drizzle-orm";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
@@ -40,13 +38,10 @@ async function SuspendedPage({ params }: Props) {
 }
 
 async function getJobListing(id: string, orgId: string) {
-  "use cache";
-  cacheTag(getJobListingIdTag(id));
-
   return db.query.JobListingTable.findFirst({
     where: and(
       eq(JobListingTable.id, id),
-      eq(JobListingTable.organizationId, orgId)
+      eq(JobListingTable.organizationId, orgId),
     ),
   });
 }

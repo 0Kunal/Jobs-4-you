@@ -12,8 +12,6 @@ import { getCurrentUser } from "@/services/clerk/lib/getCurrentAuth";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
-import { getUserResumeIdTag } from "@/features/users/db/cache/userResumes";
 import { db } from "@/drizzle/db";
 import { eq } from "drizzle-orm";
 import { UserResumeTable } from "@/drizzle/schema";
@@ -84,9 +82,6 @@ async function AISummaryCard() {
 }
 
 async function getUserResume(userId: string) {
-  "use cache";
-  cacheTag(getUserResumeIdTag(userId));
-
   return db.query.UserResumeTable.findFirst({
     where: eq(UserResumeTable.userId, userId),
   });

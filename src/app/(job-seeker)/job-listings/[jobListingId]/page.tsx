@@ -9,8 +9,6 @@ import { Suspense } from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import ClientSheet from "./_ClientSheet";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
-import { getJobListingIdTag } from "@/features/jobListings/db/cache/jobListings";
 import { db } from "@/drizzle/db";
 import { and, eq } from "drizzle-orm";
 import {
@@ -18,7 +16,6 @@ import {
   JobListingTable,
   UserResumeTable,
 } from "@/drizzle/schema";
-import { getOrganizationIdTag } from "@/features/organizations/db/cache/organizations";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -34,10 +31,8 @@ import {
 } from "@/components/ui/popover";
 import { SignUpButton } from "@/services/clerk/components/AuthButtons";
 import { getCurrentUser } from "@/services/clerk/lib/getCurrentAuth";
-import { getJobListingApplcationIdTag } from "@/features/jobListingApplications/db/cache/jobListingApplications";
 import { differenceInDays } from "date-fns";
 import { connection } from "next/server";
-import { getUserResumeIdTag } from "@/features/users/db/cache/userResumes";
 import {
   Dialog,
   DialogContent,
@@ -241,9 +236,6 @@ async function ApplyButton({ jobListingId }: { jobListingId: string }) {
 }
 
 async function getUserResume(userId: string) {
-  "use cache";
-  cacheTag(getUserResumeIdTag(userId));
-
   return db.query.UserResumeTable.findFirst({
     where: eq(UserResumeTable.userId, userId),
   });
@@ -256,34 +248,24 @@ async function getJobListingApplication({
   userId: string;
   jobListingId: string;
 }) {
-  "use cache";
-  cacheTag(getJobListingApplcationIdTag({ userId, jobListingId }));
-
   return db.query.JobListingApplicationTable.findFirst({
     where: and(
       eq(JobListingApplicationTable.userId, userId),
-      eq(JobListingApplicationTable.jobListingId, jobListingId)
+      eq(JobListingApplicationTable.jobListingId, jobListingId),
     ),
   });
 }
 
 async function getJobListing(id: string) {
-  "use cache";
-  cacheTag(getJobListingIdTag(id));
-
   const listing = await db.query.JobListingTable.findFirst({
     where: and(
       eq(JobListingTable.id, id),
-      eq(JobListingTable.status, "published")
+      eq(JobListingTable.status, "published"),
     ),
     with: {
       organization: { columns: { id: true, name: true, imageUrl: true } },
     },
   });
-
-  if (listing != null) {
-    cacheTag(getOrganizationIdTag(listing.organization.id));
-  }
 
   return listing;
 }

@@ -11,11 +11,6 @@ import {
   updateJobListing as updateJobListingDb,
   deleteJobListing as deleteJobListingDb,
 } from "../db/jobListings";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
-import {
-  getJobListingGlobalTag,
-  getJobListingIdTag,
-} from "../db/cache/jobListings";
 import { db } from "@/drizzle/db";
 import { and, eq } from "drizzle-orm";
 import { JobListingTable } from "@/drizzle/schema";
@@ -28,7 +23,7 @@ import {
 import { getMatchingJobListings } from "@/services/inngest/ai/getMatchingJobListings";
 
 export async function createJobListing(
-  unsafeData: z.infer<typeof jobListingSchema>
+  unsafeData: z.infer<typeof jobListingSchema>,
 ) {
   const { orgId } = await getCurrentOrganization();
 
@@ -61,7 +56,7 @@ export async function createJobListing(
 
 export async function updateJobListing(
   id: string,
-  unsafeData: z.infer<typeof jobListingSchema>
+  unsafeData: z.infer<typeof jobListingSchema>,
 ) {
   const { orgId } = await getCurrentOrganization();
 
@@ -173,7 +168,7 @@ export async function deleteJobListing(id: string) {
 }
 
 export async function getAiJobListingSearchResults(
-  unsafe: z.infer<typeof jobListingAiSearchSchema>
+  unsafe: z.infer<typeof jobListingAiSearchSchema>,
 ): Promise<
   { error: true; message: string } | { error: false; jobIds: string[] }
 > {
@@ -197,7 +192,7 @@ export async function getAiJobListingSearchResults(
   const matchedListings = await getMatchingJobListings(
     data.query,
     allListings,
-    { maxNumberOfJobs: 10 }
+    { maxNumberOfJobs: 10 },
   );
   if (matchedListings.length === 0) {
     return {
@@ -210,21 +205,15 @@ export async function getAiJobListingSearchResults(
 }
 
 async function getJobListing(id: string, orgId: string) {
-  "use cache";
-  cacheTag(getJobListingIdTag(id));
-
   return db.query.JobListingTable.findFirst({
     where: and(
       eq(JobListingTable.id, id),
-      eq(JobListingTable.organizationId, orgId)
+      eq(JobListingTable.organizationId, orgId),
     ),
   });
 }
 
 async function getPublicJobListings() {
-  "use cache";
-  cacheTag(getJobListingGlobalTag());
-
   return db.query.JobListingTable.findMany({
     where: eq(JobListingTable.status, "published"),
   });

@@ -17,8 +17,6 @@ import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
 import { redirect } from "next/navigation";
 import { AsyncIf } from "@/components/AsyncIf";
 import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
-import { getJobListingOrganizationTag } from "@/features/jobListings/db/cache/jobListings";
 import { db } from "@/drizzle/db";
 import {
   JobListingApplicationTable,
@@ -26,7 +24,6 @@ import {
   JobListingTable,
 } from "@/drizzle/schema";
 import { count, desc, eq } from "drizzle-orm";
-import { getJobListingApplicationJobListingTag } from "@/features/jobListingApplications/db/cache/jobListingApplications";
 import { sortJobListingsByStatus } from "@/features/jobListings/lib/utils";
 import JobListingMenuGroup from "./_JobListingMenuGroup";
 
@@ -101,7 +98,7 @@ async function JobListingMenu({ orgId }: { orgId: string }) {
 
   return Object.entries(Object.groupBy(jobListings, (j) => j.status))
     .sort(([a], [b]) =>
-      sortJobListingsByStatus(a as JobListingStatus, b as JobListingStatus)
+      sortJobListingsByStatus(a as JobListingStatus, b as JobListingStatus),
     )
     .map(([status, jobListings]) => (
       <JobListingMenuGroup
@@ -113,9 +110,6 @@ async function JobListingMenu({ orgId }: { orgId: string }) {
 }
 
 async function getJobListings(orgId: string) {
-  "use cache";
-  cacheTag(getJobListingOrganizationTag(orgId));
-
   const data = await db
     .select({
       id: JobListingTable.id,
@@ -127,14 +121,10 @@ async function getJobListings(orgId: string) {
     .where(eq(JobListingTable.organizationId, orgId))
     .leftJoin(
       JobListingApplicationTable,
-      eq(JobListingTable.id, JobListingApplicationTable.jobListingId)
+      eq(JobListingTable.id, JobListingApplicationTable.jobListingId),
     )
     .groupBy(JobListingApplicationTable.jobListingId, JobListingTable.id)
     .orderBy(desc(JobListingTable.createdAt));
-
-  data.forEach((jobListing) =>
-    cacheTag(getJobListingApplicationJobListingTag(jobListing.id))
-  );
 
   return data;
 }

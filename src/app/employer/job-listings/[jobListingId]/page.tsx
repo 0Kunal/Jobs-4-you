@@ -19,22 +19,18 @@ import {
 import ApplicationTable, {
   SkeletonApplicationTable,
 } from "@/features/jobListingApplications/components/ApplicationTable";
-import { getJobListingApplicationJobListingTag } from "@/features/jobListingApplications/db/cache/jobListingApplications";
 import {
   deleteJobListing,
   toggleJobListingFeatured,
   toggleJobListingStatus,
 } from "@/features/jobListings/actions/actions";
 import JobListingBadges from "@/features/jobListings/components/JobListingBadges";
-import { getJobListingIdTag } from "@/features/jobListings/db/cache/jobListings";
 import { formatJobListingStatus } from "@/features/jobListings/lib/formatters";
 import {
   hasReachedMaxFeaturedJobListings,
   hasReachedMaxPublishedJobListings,
 } from "@/features/jobListings/lib/planFeatureHelpers";
 import { getNextJobListingStatus } from "@/features/jobListings/lib/utils";
-import { getUserResumeIdTag } from "@/features/users/db/cache/userResumes";
-import { getUserIdTag } from "@/features/users/db/cache/users";
 import { getCurrentOrganization } from "@/services/clerk/lib/getCurrentAuth";
 import { hasOrgUserPermission } from "@/services/clerk/lib/orgUserPermissions";
 import { and, eq } from "drizzle-orm";
@@ -46,7 +42,6 @@ import {
   StarOffIcon,
   Trash2Icon,
 } from "lucide-react";
-import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React, { ReactNode, Suspense } from "react";
@@ -307,19 +302,16 @@ async function Applications({ jobListingId }: { jobListingId: string }) {
         ) : null,
       }))}
       canUpdateRating={await hasOrgUserPermission(
-        "org:job_listing_applications:change_rating"
+        "org:job_listing_applications:change_rating",
       )}
       canUpdateStage={await hasOrgUserPermission(
-        "org:job_listing_applications:change_stage"
+        "org:job_listing_applications:change_stage",
       )}
     />
   );
 }
 
 async function getJobListingApplications(jobListingId: string) {
-  "use cache";
-  cacheTag(getJobListingApplicationJobListingTag(jobListingId));
-
   const data = await db.query.JobListingApplicationTable.findMany({
     where: eq(JobListingApplicationTable.jobListingId, jobListingId),
     columns: {
@@ -348,22 +340,14 @@ async function getJobListingApplications(jobListingId: string) {
     },
   });
 
-  data.forEach(({ user }) => {
-    cacheTag(getUserIdTag(user.id));
-    cacheTag(getUserResumeIdTag(user.id));
-  });
-
   return data;
 }
 
 async function getJobListing(id: string, orgId: string) {
-  "use cache";
-  cacheTag(getJobListingIdTag(id));
-
   return db.query.JobListingTable.findFirst({
     where: and(
       eq(JobListingTable.id, id),
-      eq(JobListingTable.organizationId, orgId)
+      eq(JobListingTable.organizationId, orgId),
     ),
   });
 }
